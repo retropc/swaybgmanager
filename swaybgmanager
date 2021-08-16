@@ -53,7 +53,10 @@ def main():
   sub.subscribe("workspace")
 
   while True:
-    sub.read_event(sway.EVENT_WORKSPACE)
+    e = sub.read_event(sway.EVENT_WORKSPACE)
+    if e.get("change") == "reload":
+      existing_model = {}
+
     existing_model = update(cmd, existing_model)
 
 if __name__ == "__main__":
