@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+
+import sway
+import config
+import outputs
+
+def update_model(model, workspaces):
+  model = dict(model)
+
+  for w in workspaces:
+    if not w["visible"]:
+      continue
+
+    output = w["output"]
+    d = outputs.OUTPUTS.get(output)
+    model[output] = d(w) if d else None
+
+  return model
+
+def apply_model(cmd, old_model, new_model):
+  # as sway seems to lag out: calculate and apply deltas instead of applying everything each time the workspace changes
+
+  commands = {}
+
+  for output, v in new_model.items():
+    if output not in old_model or old_model[output] != v:
+      # added / updated (careful of None's)
+      commands[output] = v
+
+  for output in old_model.keys():
+    if output in new_model:
+      continue
+
+    # deleted
+    commands[output] = None
+
+  for output, args in commands.items():
+    if args is None:
+      args = config.UNSET
+    cmd.run_command("output %s %s" % (output, (" ".join(args))))
+
+def update(cmd, existing_model):
+  new_model = update_model(existing_model, cmd.get_workspaces())
+  apply_model(cmd, existing_model, new_model)
+  return new_model
+
+def main():
+  cmd = sway.Sway()
+
+  existing_model = update(cmd, {})
+
+  sub = sway.Sway()
+  sub.subscribe("workspace")
+
+  while True:
+    sub.read_event(sway.EVENT_WORKSPACE)
+    existing_model = update(cmd, existing_model)
+
+if __name__ == "__main__":
+  main()

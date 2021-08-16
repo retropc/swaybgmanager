@@ -1,0 +1,29 @@
+from outputs import *
+
+# put any custom logic in here
+
+UNSET = colour("#555555")
+BAD = colour("#FF0000")
+
+def check_bad(fn):
+  def decorator(workspace):
+    if workspace["name"] in ("12", "13", "14"):
+      return BAD
+    return fn(workspace)
+
+  return decorator
+
+@output("DP-1")
+@check_bad
+def DP1(workspace):
+  return bg("/home/me/Pictures/left.jpg", "fill")
+
+@output("DP-2")
+@check_bad
+def DP2(workspace):
+  return bg("/home/me/Pictures/middle.jpg", "fill")
+
+@output("DVI-D-1")
+@check_bad
+def DVID1(workspace):
+  return bg("/home/me/Pictures.jpg", "fill")
