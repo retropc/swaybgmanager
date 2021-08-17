@@ -26,4 +26,4 @@ def DP2(workspace):
 @output("DVI-D-1")
 @check_bad
 def DVID1(workspace):
-  return bg("/home/me/Pictures.jpg", "fill")
+  return bg("/home/me/Pictures/right.jpg", "fill")
